@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple MMO Game</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .splash-screen {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .game-container {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background: #2c3e50;
+        }
+
+        .game-header {
+            background: #34495e;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-world {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .grid-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border: 3px solid #34495e;
+            background: #ecf0f1;
+            overflow: hidden;
+        }
+
+        .player {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .chat-container {
+            background: #34495e;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .chat-send {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-send:hover {
+            background: #2980b9;
+        }
+
+        .login-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        .login-btn:hover {
+            background: #2980b9;
+        }
+
+        .emoji-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .emoji-option {
+            font-size: 30px;
+            cursor: pointer;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .emoji-option:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .emoji-option.selected {
+            background: #3498db;
+            border-color: #2980b9;
+        }
+
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .controls {
+            color: white;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .message {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .message .username {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .message .timestamp {
+            color: #bdc3c7;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <h1>🎮 Simple MMO Game</h1>
+        <p>Welcome to our simple multiplayer game! Move around with arrow keys and chat with other players.</p>
+        
+        <div id="loginSection">
+            <button id="loginBtn" class="login-btn">Login with Puter</button>
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+
+        <div id="emojiSection" style="display: none;">
+            <h3>Choose your avatar:</h3>
+            <div class="emoji-selector">
+                <div class="emoji-option" data-emoji="😀">😀</div>
+                <div class="emoji-option" data-emoji="😎">😎</div>
+                <div class="emoji-option" data-emoji="🤖">🤖</div>
+                <div class="emoji-option" data-emoji="👾">👾</div>
+                <div class="emoji-option" data-emoji="🐱">🐱</div>
+                <div class="emoji-option" data-emoji="🐶">🐶</div>
+                <div class="emoji-option" data-emoji="🦄">🦄</div>
+                <div class="emoji-option" data-emoji="🐸">🐸</div>
+            </div>
+            <button id="startGameBtn" class="login-btn" style="display: none;">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="game-container">
+        <div class="game-header">
+            <div>
+                <span id="playerInfo">Player: Loading...</span>
+            </div>
+            <div>
+                <span id="onlineCount">Players online: 0</span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            Use arrow keys to move around the room
+        </div>
+
+        <div class="game-world">
+            <div id="gameGrid" class="grid-container">
+                <!-- Players will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages">
+                <div class="message">
+                    <span class="timestamp">[System]</span> Welcome to the game! Use arrow keys to move and chat below.
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." maxlength="200">
+                <button id="chatSend" class="chat-send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <footer style="position: fixed; bottom: 10px; right: 10px; color: white; font-size: 12px;">
+        <a href="https://developer.puter.com" style="color: #3498db;">Powered by Puter</a>
+    </footer>
+</body>
+</html>
