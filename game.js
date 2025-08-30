@@ -2,8 +2,8 @@
 const GAME_CONFIG = {
     // Replace this with your deployed worker URL
     // Example: 'https://your-worker-name.puter.work'
-    workerUrl: 'https://triptych-mmo.puter.work', // Set to null to auto-deploy, or provide your worker URL
-    autoDeployWorker: false // Set to false if using a pre-deployed worker
+    workerUrl: null, // Set to null to auto-deploy, or provide your worker URL
+    autoDeployWorker: true // Set to false if using a pre-deployed worker
 };
 
 // Game state
@@ -568,3 +568,4 @@ function showStatus(message) {
     status.textContent = message;
     status.style.display = 'block';
 }
+
